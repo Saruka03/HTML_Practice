@@ -23,6 +23,13 @@ export const StudyArea = ({ onBack, onSelectQuestion, onViewReferences, onViewTa
   });
   const [showingHtmlQuiz, setShowingHtmlQuiz] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [completedLessons, setCompletedLessons] = useState<Set<string>>(() => {
+    // Restore completed lessons from sessionStorage
+    const saved = sessionStorage.getItem('studyAreaCompletedLessons');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = React.useRef(0);
   const tasksRef = React.useRef<HTMLDivElement>(null);
   
   // Load questions from database
@@ -43,6 +50,11 @@ export const StudyArea = ({ onBack, onSelectQuestion, onViewReferences, onViewTa
       sessionStorage.removeItem('studyAreaSelectedTaskId');
     }
   }, [selectedTaskId]);
+  
+  // Save completed lessons to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('studyAreaCompletedLessons', JSON.stringify([...completedLessons]));
+  }, [completedLessons]);
   
   const lessons = useMemo(() => ([
     {
@@ -1053,6 +1065,8 @@ worker.onmessage = function(event) {
   
   const goToNextLesson = () => {
     if (!isLastLesson) {
+      // Mark current lesson as completed before moving to next
+      setCompletedLessons(prev => new Set([...prev, activeLessonId]));
       setActiveLessonId(lessons[currentLessonIndex + 1].id);
     }
   };
@@ -1073,10 +1087,30 @@ worker.onmessage = function(event) {
       }, 100);
     }
   }, []);
+  
+  // Hide header on scroll down, show on scroll up
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        // Scrolling down - hide header
+        setIsHeaderVisible(false);
+      } else {
+        // Scrolling up - show header
+        setIsHeaderVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="study-container">
-      <header className="study-header">
+      <header className={`study-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
         <nav className="w3schools-nav">
           <div className="nav-left">
             <div className="nav-brand">
@@ -1125,7 +1159,7 @@ worker.onmessage = function(event) {
               {lessons.map((lesson) => (
                 <li key={lesson.id}>
                   <button
-                    className={`topic-item relative isolate flex items-center w-full px-4 py-3 rounded-full text-slate-300 transition-all duration-300 hover:text-white hover:bg-white/5 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] ${lesson.id === activeLessonId && !isShowingTask && !showingHtmlQuiz ? "active bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.7)] before:content-[''] before:absolute before:inset-0 before:bg-blue-500/20 before:blur-xl before:rounded-full before:-z-10" : ''}`}
+                    className={`topic-item relative isolate flex items-center w-full px-4 py-3 rounded-full text-slate-300 transition-all duration-300 hover:text-white hover:bg-white/5 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] ${lesson.id === activeLessonId && !isShowingTask && !showingHtmlQuiz ? "active bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.7)] before:content-[''] before:absolute before:inset-0 before:bg-blue-500/20 before:blur-xl before:rounded-full before:-z-10" : ''} ${completedLessons.has(lesson.id) && lesson.id !== activeLessonId ? 'completed' : ''}`}
                     onClick={() => {
                       setActiveLessonId(lesson.id);
                       setSelectedTaskId(null);

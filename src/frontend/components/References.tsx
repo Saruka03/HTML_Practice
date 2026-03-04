@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 interface ReferencesProps {
@@ -9,6 +9,26 @@ interface ReferencesProps {
 export const References = ({ onBack, onViewTags }: ReferencesProps) => {
   const { user, logout } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<'tags' | 'attributes' | 'events'>('tags');
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = React.useRef(0);
+  
+  // Hide header on scroll down, show on scroll up
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsHeaderVisible(false);
+      } else {
+        setIsHeaderVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const htmlTags = [
     { tag: '<!DOCTYPE>', description: 'Defines the document type', category: 'Basic' },
@@ -76,7 +96,7 @@ export const References = ({ onBack, onViewTags }: ReferencesProps) => {
 
   return (
     <div className="study-container">
-      <header className="study-header">
+      <header className={`study-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
         <nav className="w3schools-nav">
           <div className="nav-logo">
             <span className="logo-text">AUSDAV</span>

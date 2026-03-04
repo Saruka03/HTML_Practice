@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { HTML_TAGS_REFERENCE } from '../utils/htmlTagsReference';
 
@@ -34,14 +34,33 @@ const getRenderingExample = (tagName: string): string => {
 export const TagsPage = ({ onBack, onViewReferences }: TagsPageProps) => {
   const { user, logout } = useAuth();
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
-
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = React.useRef(0);
+  
+  // Hide header on scroll down, show on scroll up
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsHeaderVisible(false);
+      } else {
+        setIsHeaderVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // show all tags (no filtering)
   const filteredTags = HTML_TAGS_REFERENCE;
 
   return (
     <div className="study-container">
-      <header className="study-header">
+      <header className={`study-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
         <nav className="w3schools-nav">
           <div className="nav-logo">
             <span className="logo-text">AUSDAV</span>
