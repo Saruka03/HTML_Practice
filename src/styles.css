@@ -3367,8 +3367,8 @@ a.button:focus {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(129, 180, 255, 0.6);
   border-radius: 12px;
-  color: #93c5fd;
-  font-size: 14px;
+  color: #ffffff;
+  font-size: 16px;
   line-height: 1.6;
   box-shadow: 
     0 0 10px rgba(129, 180, 255, 0.2),
@@ -3392,8 +3392,8 @@ a.button:focus {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(129, 180, 255, 0.6);
   border-radius: 12px;
-  color: #93c5fd;
-  font-size: 14px;
+  color: #ffffff;
+  font-size: 16px;
   line-height: 1.6;
   box-shadow: 
     0 0 10px rgba(129, 180, 255, 0.2),
@@ -3411,6 +3411,8 @@ a.button:focus {
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
+  color: #ffffff;
+  font-size: 16px;
   box-shadow: 
     0 0 15px rgba(129, 180, 255, 0.2),
     inset 0 0 30px rgba(129, 180, 255, 0.05);
@@ -3425,7 +3427,8 @@ a.button:focus {
 .takeaways-list {
   margin: 16px 0 0 20px;
   padding: 0;
-  color: #e2e8f0;
+  color: #ffffff;
+  font-size: 16px;
 }
 
 .takeaways-list li {

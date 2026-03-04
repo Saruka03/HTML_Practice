@@ -1155,7 +1155,7 @@ worker.onmessage = function(event) {
             </button>
             
             <div className="sidebar-title text-blue-400 font-semibold tracking-wider text-sm uppercase mb-6">HTML Topics</div>
-            <ul className="topic-list space-y-2">
+            <ul className="topic-list space-y-4">
               {lessons.map((lesson) => (
                 <li key={lesson.id}>
                   <button
@@ -1176,7 +1176,7 @@ worker.onmessage = function(event) {
             {tasksLoaded || questions.length > 0 ? (
               <>
                 <div ref={tasksRef} className="sidebar-title mt-6 text-blue-400 font-semibold tracking-wider text-sm uppercase">HTML Tasks</div>
-                <ul className="topic-list space-y-2">
+                <ul className="topic-list space-y-4">
                   {questions.length > 0 ? (
                     questions.map((question) => (
                       <li key={`task-${question.id}`}>
